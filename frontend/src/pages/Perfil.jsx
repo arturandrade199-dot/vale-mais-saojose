@@ -18,6 +18,7 @@ export default function Perfil() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState("");
+  const [editing, setEditing] = useState(false);
   const [searchParams] = useSearchParams();
   const checkoutFlag = searchParams.get("checkout");
 
@@ -100,9 +101,29 @@ export default function Perfil() {
 
       {!profile && <ProfileForm email={user?.email} onSaved={setProfile} />}
 
-      {profile && (
+      {profile && editing && (
+        <ProfileForm
+          email={profile.email}
+          initialData={profile}
+          onSaved={(updated) => {
+            setProfile(updated);
+            setEditing(false);
+          }}
+          onCancel={() => setEditing(false)}
+        />
+      )}
+
+      {profile && !editing && (
         <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-2 text-sm">
-          <h2 className="font-medium text-slate-700 mb-2">Dados cadastrais</h2>
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="font-medium text-slate-700">Dados cadastrais</h2>
+            <button
+              onClick={() => setEditing(true)}
+              className="text-xs font-semibold text-brand-green hover:text-brand-greenLight"
+            >
+              Editar
+            </button>
+          </div>
           <p>
             <span className="text-slate-400">Nome:</span> {profile.full_name}
           </p>

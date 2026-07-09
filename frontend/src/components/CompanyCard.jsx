@@ -10,9 +10,20 @@ function initials(name) {
     .toUpperCase();
 }
 
-export default function CompanyCard({ company }) {
+export default function CompanyCard({ company, isFavorite, onToggleFavorite }) {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex gap-4 items-start hover:shadow-md transition">
+    <div className="relative bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex gap-4 items-start hover:shadow-md transition">
+      <button
+        type="button"
+        onClick={() => onToggleFavorite(company.id)}
+        aria-label={isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+        aria-pressed={isFavorite}
+        className={`absolute top-3 right-3 text-xl leading-none transition ${
+          isFavorite ? "text-red-500" : "text-slate-300 hover:text-red-300"
+        }`}
+      >
+        {isFavorite ? "♥" : "♡"}
+      </button>
       {company.logo_url ? (
         <img
           src={company.logo_url}
@@ -24,7 +35,7 @@ export default function CompanyCard({ company }) {
           {initials(company.name)}
         </div>
       )}
-      <div className="min-w-0">
+      <div className="min-w-0 pr-6">
         <h3 className="font-semibold text-slate-900 truncate">{company.name}</h3>
         <span className="inline-block text-xs font-medium text-brand-green bg-green-50 rounded-full px-2 py-0.5 mt-1">
           {company.category_name}

@@ -4,6 +4,12 @@ import CategoryFilter from "../components/CategoryFilter";
 import CompanyCard from "../components/CompanyCard";
 import SearchBar from "../components/SearchBar";
 import { api } from "../lib/api";
+import {
+  getFavorites,
+  getShowOnlyFavorites,
+  saveFavorites,
+  saveShowOnlyFavorites,
+} from "../lib/favorites";
 
 export default function Painel() {
   const [categories, setCategories] = useState([]);
@@ -13,6 +19,29 @@ export default function Painel() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [inactive, setInactive] = useState(false);
+  const [favorites, setFavorites] = useState(() => getFavorites());
+  const [showOnlyFavorites, setShowOnlyFavorites] = useState(() => getShowOnlyFavorites());
+
+  function toggleFavorite(companyId) {
+    setFavorites((prev) => {
+      const next = new Set(prev);
+      if (next.has(companyId)) {
+        next.delete(companyId);
+      } else {
+        next.add(companyId);
+      }
+      saveFavorites(next);
+      return next;
+    });
+  }
+
+  function toggleShowOnlyFavorites() {
+    setShowOnlyFavorites((prev) => {
+      const next = !prev;
+      saveShowOnlyFavorites(next);
+      return next;
+    });
+  }
 
   useEffect(() => {
     api.getCategories().then(setCategories).catch(() => {});
@@ -40,10 +69,16 @@ export default function Painel() {
     return () => clearTimeout(timeout);
   }, [selectedCategory, search]);
 
+  const visibleCompanies = useMemo(() => {
+    if (!showOnlyFavorites) return companies;
+    return companies.filter((company) => favorites.has(company.id));
+  }, [companies, favorites, showOnlyFavorites]);
+
   const emptyMessage = useMemo(() => {
+    if (showOnlyFavorites) return "Você ainda não favoritou nenhum parceiro.";
     if (search || selectedCategory) return "Nenhuma empresa encontrada com esse filtro.";
     return "Nenhuma empresa parceira cadastrada ainda.";
-  }, [search, selectedCategory]);
+  }, [search, selectedCategory, showOnlyFavorites]);
 
   if (inactive) {
     return (
@@ -70,23 +105,43 @@ export default function Painel() {
 
       <div className="space-y-4 mb-6">
         <SearchBar value={search} onChange={setSearch} />
-        <CategoryFilter
-          categories={categories}
-          selected={selectedCategory}
-          onSelect={setSelectedCategory}
-        />
+        <div className="flex flex-wrap items-center gap-2">
+          <CategoryFilter
+            categories={categories}
+            selected={selectedCategory}
+            onSelect={setSelectedCategory}
+          />
+          <button
+            type="button"
+            onClick={toggleShowOnlyFavorites}
+            aria-pressed={showOnlyFavorites}
+            className={`px-3 py-1.5 rounded-full text-sm border transition flex items-center gap-1 ${
+              showOnlyFavorites
+                ? "bg-red-500 text-white border-red-500"
+                : "bg-white text-slate-600 border-slate-300 hover:border-red-300"
+            }`}
+          >
+            <span>{showOnlyFavorites ? "♥" : "♡"}</span>
+            Somente favoritos
+          </button>
+        </div>
       </div>
 
       {error && <p className="text-red-600">{error}</p>}
       {loading && <p className="text-slate-500">Carregando...</p>}
 
-      {!loading && !error && companies.length === 0 && (
+      {!loading && !error && visibleCompanies.length === 0 && (
         <p className="text-slate-500">{emptyMessage}</p>
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {companies.map((company) => (
-          <CompanyCard key={company.id} company={company} />
+        {visibleCompanies.map((company) => (
+          <CompanyCard
+            key={company.id}
+            company={company}
+            isFavorite={favorites.has(company.id)}
+            onToggleFavorite={toggleFavorite}
+          />
         ))}
       </div>
     </div>

@@ -1,18 +1,21 @@
 import { useState } from "react";
 import { api } from "../lib/api";
 
-const initialForm = {
-  fullName: "",
-  phone: "",
-  age: "",
-  sex: "",
-  neighborhood: "",
-  city: "São José",
-  street: "",
-};
+function formFromProfile(profile) {
+  return {
+    fullName: profile?.full_name || "",
+    phone: profile?.phone || "",
+    age: profile?.age != null ? String(profile.age) : "",
+    sex: profile?.sex || "",
+    neighborhood: profile?.neighborhood || "",
+    city: profile?.city || "São José",
+    street: profile?.street || "",
+  };
+}
 
-export default function ProfileForm({ email, onSaved }) {
-  const [form, setForm] = useState(initialForm);
+export default function ProfileForm({ email, initialData, onSaved, onCancel }) {
+  const isEditing = Boolean(initialData);
+  const [form, setForm] = useState(() => formFromProfile(initialData));
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -45,9 +48,13 @@ export default function ProfileForm({ email, onSaved }) {
 
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-5 mb-6">
-      <h2 className="font-medium text-slate-700 mb-1">Complete seu cadastro</h2>
+      <h2 className="font-medium text-slate-700 mb-1">
+        {isEditing ? "Editar cadastro" : "Complete seu cadastro"}
+      </h2>
       <p className="text-sm text-slate-500 mb-4">
-        Precisamos desses dados antes de liberar a assinatura.
+        {isEditing
+          ? "Atualize seus dados, incluindo o endereço."
+          : "Precisamos desses dados antes de liberar a assinatura."}
       </p>
       <form onSubmit={handleSubmit} className="space-y-3">
         <input
@@ -106,13 +113,25 @@ export default function ProfileForm({ email, onSaved }) {
           className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-green"
         />
         {error && <p className="text-sm text-red-600">{error}</p>}
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-lg bg-brand-green text-white font-semibold py-2.5 hover:bg-brand-greenLight transition disabled:opacity-60"
-        >
-          {loading ? "Salvando..." : "Salvar cadastro"}
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex-1 rounded-lg bg-brand-green text-white font-semibold py-2.5 hover:bg-brand-greenLight transition disabled:opacity-60"
+          >
+            {loading ? "Salvando..." : isEditing ? "Salvar alterações" : "Salvar cadastro"}
+          </button>
+          {onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              disabled={loading}
+              className="rounded-lg border border-slate-300 text-slate-600 font-semibold px-4 py-2.5 hover:bg-slate-50 transition disabled:opacity-60"
+            >
+              Cancelar
+            </button>
+          )}
+        </div>
       </form>
     </div>
   );
