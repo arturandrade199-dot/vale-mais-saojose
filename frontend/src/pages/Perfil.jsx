@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import ProfileForm from "../components/ProfileForm";
+import VirtualCard from "../components/VirtualCard";
+import VirtualCardForm from "../components/VirtualCardForm";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../lib/api";
 
@@ -19,6 +21,7 @@ export default function Perfil() {
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState("");
   const [editing, setEditing] = useState(false);
+  const [cardEditing, setCardEditing] = useState(false);
   const [searchParams] = useSearchParams();
   const checkoutFlag = searchParams.get("checkout");
 
@@ -145,6 +148,35 @@ export default function Perfil() {
               <span className="text-slate-400">Endereço:</span>{" "}
               {[profile.street, profile.neighborhood, profile.city].filter(Boolean).join(", ")}
             </p>
+          )}
+        </div>
+      )}
+
+      {profile && (
+        <div className="mt-8">
+          <h2 className="text-lg font-bold text-brand-navy mb-3">Cartão Vale Mais Virtual</h2>
+          {!isActive ? (
+            <div className="bg-white rounded-xl border border-slate-200 p-5 text-sm text-slate-500">
+              Assine o Vale Mais São José para gerar seu cartão virtual de descontos.
+            </div>
+          ) : profile.cpf && profile.birth_date && !cardEditing ? (
+            <VirtualCard
+              profile={profile}
+              userId={user?.id}
+              isActive={isActive}
+              onEdit={() => setCardEditing(true)}
+            />
+          ) : (
+            <VirtualCardForm
+              profile={profile}
+              onSaved={(updated) => {
+                setProfile(updated);
+                setCardEditing(false);
+              }}
+              onCancel={
+                profile.cpf && profile.birth_date ? () => setCardEditing(false) : undefined
+              }
+            />
           )}
         </div>
       )}

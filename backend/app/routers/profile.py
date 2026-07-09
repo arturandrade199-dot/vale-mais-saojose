@@ -20,8 +20,11 @@ def get_profile(user: CurrentUser = Depends(get_current_user)):
 
 @router.post("", response_model=ProfileOut)
 def upsert_profile(payload: ProfileIn, user: CurrentUser = Depends(get_current_user)):
+    """Cria ou atualiza o perfil. Só sobrescreve os campos enviados no
+    corpo da requisição (exclude_unset) — quem chama pode mandar só um
+    subconjunto dos campos (ex.: só os dados do cartão) sem apagar o resto."""
     client = get_service_client()
-    row = {"id": user.id, **payload.model_dump()}
+    row = {"id": user.id, **payload.model_dump(exclude_unset=True)}
     result = client.table("profiles").upsert(row).execute()
     if not result.data:
         raise HTTPException(status_code=400, detail="Não foi possível salvar o perfil")

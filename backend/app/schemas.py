@@ -14,6 +14,8 @@ class ProfileIn(BaseModel):
     neighborhood: str | None = None
     city: str | None = None
     street: str | None = None
+    cpf: str | None = None
+    birth_date: str | None = None
 
 
 class ProfileOut(ProfileIn):

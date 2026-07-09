@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import CategoryFilter from "../components/CategoryFilter";
 import CompanyCard from "../components/CompanyCard";
+import FiltersBar from "../components/FiltersBar";
 import SearchBar from "../components/SearchBar";
 import { api } from "../lib/api";
 import {
@@ -103,28 +103,15 @@ export default function Painel() {
       <h1 className="text-2xl font-bold text-brand-navy mb-1">Empresas Parceiras</h1>
       <p className="text-slate-500 mb-6">Aproveite os descontos exclusivos para assinantes.</p>
 
-      <div className="space-y-4 mb-6">
+      <div className="space-y-3 mb-6">
         <SearchBar value={search} onChange={setSearch} />
-        <div className="flex flex-wrap items-center gap-2">
-          <CategoryFilter
-            categories={categories}
-            selected={selectedCategory}
-            onSelect={setSelectedCategory}
-          />
-          <button
-            type="button"
-            onClick={toggleShowOnlyFavorites}
-            aria-pressed={showOnlyFavorites}
-            className={`px-3 py-1.5 rounded-full text-sm border transition flex items-center gap-1 ${
-              showOnlyFavorites
-                ? "bg-red-500 text-white border-red-500"
-                : "bg-white text-slate-600 border-slate-300 hover:border-red-300"
-            }`}
-          >
-            <span>{showOnlyFavorites ? "♥" : "♡"}</span>
-            Somente favoritos
-          </button>
-        </div>
+        <FiltersBar
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onSelectCategory={setSelectedCategory}
+          showOnlyFavorites={showOnlyFavorites}
+          onToggleFavorites={toggleShowOnlyFavorites}
+        />
       </div>
 
       {error && <p className="text-red-600">{error}</p>}

@@ -29,6 +29,8 @@ create table if not exists public.profiles (
   neighborhood text,
   city text,
   street text,
+  cpf text,
+  birth_date date,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
