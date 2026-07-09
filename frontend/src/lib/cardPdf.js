@@ -4,10 +4,17 @@ import { jsPDF } from "jspdf";
 export async function generateCardPdf(cardElement) {
   if (!cardElement) return;
 
+  // Espera as fontes carregarem — sem isso o html2canvas às vezes mede a
+  // altura da linha com a fonte de fallback e corta o texto na captura.
+  if (document.fonts?.ready) {
+    await document.fonts.ready;
+  }
+
   const canvas = await html2canvas(cardElement, {
     scale: 3,
     backgroundColor: null,
     useCORS: true,
+    foreignObjectRendering: true,
   });
 
   const imgData = canvas.toDataURL("image/png");

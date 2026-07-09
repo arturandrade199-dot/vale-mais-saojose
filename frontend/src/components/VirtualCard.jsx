@@ -38,7 +38,7 @@ export default function VirtualCard({ profile, userId, isActive, onEdit }) {
             <span className="font-bold leading-tight">Vale Mais São José</span>
           </div>
           <span
-            className={`text-[10px] font-semibold rounded-full px-2 py-0.5 ${
+            className={`text-[10px] font-semibold leading-normal rounded-full px-2 py-1 ${
               isActive ? "bg-brand-greenLight text-brand-navy" : "bg-slate-500 text-white"
             }`}
           >
@@ -47,7 +47,9 @@ export default function VirtualCard({ profile, userId, isActive, onEdit }) {
         </div>
 
         <p className="text-[11px] text-slate-300 uppercase tracking-wide">Titular</p>
-        <p className="font-semibold text-lg mb-4 truncate">{profile.full_name}</p>
+        <p className="font-semibold text-lg leading-normal py-0.5 mb-4 truncate">
+          {profile.full_name}
+        </p>
 
         <div className="flex justify-between items-end gap-3">
           <div>
