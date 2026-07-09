@@ -14,7 +14,6 @@ export async function generateCardPdf(cardElement) {
     scale: 3,
     backgroundColor: null,
     useCORS: true,
-    foreignObjectRendering: true,
   });
 
   const imgData = canvas.toDataURL("image/png");
