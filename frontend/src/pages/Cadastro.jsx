@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../lib/api";
+import { translateAuthError } from "../lib/authErrors";
 import { supabase } from "../lib/supabaseClient";
 
 const initialForm = {
@@ -58,7 +59,7 @@ export default function Cadastro() {
       const { url } = await api.createCheckoutSession();
       window.location.href = url;
     } catch (err) {
-      setError(err.message || "Não foi possível concluir o cadastro.");
+      setError(translateAuthError(err.message));
       setLoading(false);
     }
   }
