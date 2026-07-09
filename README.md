@@ -55,7 +55,15 @@ Em desenvolvimento, use a [Stripe CLI](https://docs.stripe.com/stripe-cli):
 stripe listen --forward-to localhost:8000/api/webhooks/stripe
 ```
 
-O comando imprime um `whsec_...` — copie para `STRIPE_WEBHOOK_SECRET` no `backend/.env` e reinicie o backend. Em produção, configure o endpoint do webhook no painel do Stripe apontando para `https://SEU_DOMINIO/api/webhooks/stripe`.
+O comando imprime um `whsec_...` — copie para `STRIPE_WEBHOOK_SECRET` no `backend/.env` e reinicie o backend. Em produção, configure o endpoint do webhook no painel do Stripe apontando para `https://SEU_DOMINIO/api/webhooks/stripe` (não use `stripe listen` em produção — ele é só uma ferramenta de dev para simular o webhook no seu `localhost`; em produção o Stripe manda os eventos direto pro endpoint público).
+
+**Sem o Stripe CLI instalado?** Rode o checkout normalmente pelo navegador e depois sincronize manualmente pelo e-mail usado no cadastro:
+
+```bash
+python scripts/sync_subscription.py seuemail@exemplo.com
+```
+
+Esse script consulta a API do Stripe diretamente (sem depender de webhook) e atualiza o status da assinatura no Supabase — útil para testes locais.
 
 ## 3. Frontend (React)
 
