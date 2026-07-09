@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import ProfileForm from "../components/ProfileForm";
+import { useAuth } from "../context/AuthContext";
 import { api } from "../lib/api";
 
 const STATUS_LABEL = {
@@ -10,6 +12,7 @@ const STATUS_LABEL = {
 };
 
 export default function Perfil() {
+  const { user } = useAuth();
   const [profile, setProfile] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -78,18 +81,24 @@ export default function Perfil() {
             {statusInfo.text}
           </span>
         </div>
-        <button
-          onClick={isActive ? handleManage : handleSubscribe}
-          disabled={actionLoading}
-          className="w-full rounded-lg bg-brand-green text-white font-semibold py-2.5 hover:bg-brand-greenLight transition disabled:opacity-60"
-        >
-          {actionLoading
-            ? "Aguarde..."
-            : isActive
-              ? "Gerenciar assinatura"
-              : "Assinar agora — R$ 29,99/mês"}
-        </button>
+        {profile ? (
+          <button
+            onClick={isActive ? handleManage : handleSubscribe}
+            disabled={actionLoading}
+            className="w-full rounded-lg bg-brand-green text-white font-semibold py-2.5 hover:bg-brand-greenLight transition disabled:opacity-60"
+          >
+            {actionLoading
+              ? "Aguarde..."
+              : isActive
+                ? "Gerenciar assinatura"
+                : "Assinar agora — R$ 29,99/mês"}
+          </button>
+        ) : (
+          <p className="text-sm text-slate-500">Complete seu cadastro abaixo para poder assinar.</p>
+        )}
       </div>
+
+      {!profile && <ProfileForm email={user?.email} onSaved={setProfile} />}
 
       {profile && (
         <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-2 text-sm">
