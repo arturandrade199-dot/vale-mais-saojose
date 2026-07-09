@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 import stripe  # noqa: E402
 
 from app.config import get_settings  # noqa: E402
-from app.supabase_client import get_service_client  # noqa: E402
+from app.supabase_client import get_service_client, maybe_single_data  # noqa: E402
 
 _STRIPE_STATUS_MAP = {
     "active": "active",
@@ -38,8 +38,8 @@ def main() -> None:
     stripe.api_key = settings.stripe_secret_key
 
     client = get_service_client()
-    profile = (
-        client.table("profiles").select("id, email").eq("email", email).maybe_single().execute().data
+    profile = maybe_single_data(
+        client.table("profiles").select("id, email").eq("email", email).maybe_single()
     )
     if not profile:
         print(f"Nenhum perfil encontrado no Supabase com o e-mail {email}. Complete o cadastro no app primeiro.")

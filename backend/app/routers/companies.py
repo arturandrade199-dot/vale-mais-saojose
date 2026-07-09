@@ -2,21 +2,17 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.auth import CurrentUser, get_current_user
 from app.schemas import CategoryOut, CompanyOut
-from app.supabase_client import get_service_client
+from app.supabase_client import get_service_client, maybe_single_data
 
 router = APIRouter(prefix="/api", tags=["companies"])
 
 
 def _require_active_subscription(user_id: str) -> None:
     client = get_service_client()
-    result = (
-        client.table("subscriptions")
-        .select("status")
-        .eq("user_id", user_id)
-        .maybe_single()
-        .execute()
+    data = maybe_single_data(
+        client.table("subscriptions").select("status").eq("user_id", user_id).maybe_single()
     )
-    status_value = result.data["status"] if result.data else "inactive"
+    status_value = data["status"] if data else "inactive"
     if status_value != "active":
         raise HTTPException(
             status_code=403,
