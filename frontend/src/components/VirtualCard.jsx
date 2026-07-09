@@ -1,4 +1,5 @@
 import Logo from "./Logo";
+import { generateCardPdf } from "../lib/cardPdf";
 import { formatCPF } from "../lib/cpf";
 
 function formatBirthDate(value) {
@@ -47,13 +48,22 @@ export default function VirtualCard({ profile, userId, isActive, onEdit }) {
           </div>
         </div>
       </div>
-      <button
-        type="button"
-        onClick={onEdit}
-        className="text-xs font-semibold text-brand-green hover:text-brand-greenLight mt-2"
-      >
-        Editar dados do cartão
-      </button>
+      <div className="flex items-center gap-4 mt-2">
+        <button
+          type="button"
+          onClick={() => generateCardPdf(profile, userId, isActive)}
+          className="text-xs font-semibold text-brand-navy hover:text-brand-green"
+        >
+          Baixar PDF
+        </button>
+        <button
+          type="button"
+          onClick={onEdit}
+          className="text-xs font-semibold text-brand-green hover:text-brand-greenLight"
+        >
+          Editar dados do cartão
+        </button>
+      </div>
     </div>
   );
 }
