@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import Logo from "./Logo";
 import { generateCardPdf } from "../lib/cardPdf";
 import { formatCPF } from "../lib/cpf";
@@ -13,9 +14,24 @@ function memberNumber(userId) {
 }
 
 export default function VirtualCard({ profile, userId, isActive, onEdit }) {
+  const cardRef = useRef(null);
+  const [downloading, setDownloading] = useState(false);
+
+  async function handleDownload() {
+    setDownloading(true);
+    try {
+      await generateCardPdf(cardRef.current);
+    } finally {
+      setDownloading(false);
+    }
+  }
+
   return (
     <div className="mb-6">
-      <div className="rounded-2xl bg-gradient-to-br from-brand-navy to-slate-900 text-white p-5 shadow-lg">
+      <div
+        ref={cardRef}
+        className="rounded-2xl bg-gradient-to-br from-brand-navy to-slate-900 text-white p-5 shadow-lg"
+      >
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <Logo className="h-8 w-8" />
@@ -51,10 +67,11 @@ export default function VirtualCard({ profile, userId, isActive, onEdit }) {
       <div className="flex items-center gap-4 mt-2">
         <button
           type="button"
-          onClick={() => generateCardPdf(profile, userId, isActive)}
-          className="text-xs font-semibold text-brand-navy hover:text-brand-green"
+          onClick={handleDownload}
+          disabled={downloading}
+          className="text-xs font-semibold text-brand-navy hover:text-brand-green disabled:opacity-60"
         >
-          Baixar PDF
+          {downloading ? "Gerando PDF..." : "Baixar PDF"}
         </button>
         <button
           type="button"
